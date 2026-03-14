@@ -1,0 +1,87 @@
+
+[project]
+name = "subcompose"
+description = "A command line utility to manage subsets of services in compose.yaml files."
+authors = [
+    {name = "José Hernández", email = "jh3875@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.14,<4.0"
+dependencies = [
+    "docopt-ng>=0.9.0,<1.0.0",
+    "PyYAML>=6.0.3,<7.0"
+]
+
+
+[project.scripts]
+subcompose = "subcompose.cli:main"
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+# name and version are duplicated here as a workaround for a cyclonedx-py bug:
+# https://github.com/CycloneDX/cyclonedx-python/issues — pyproject2component()
+# reads [tool.poetry] even when --pyproject points to a PEP 621 file.
+# Poetry itself ignores these values and uses [project] instead.
+name = "subcompose"
+version = "1.0.0.dev0"
+packages = [{include = "subcompose", from = "src"}]
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.0.0"
+types-pyyaml = "^6.0.12.20250915"
+mypy = "^1.19.1"
+ruff = "^0.14.10"
+pytest-cov = "^7.0.0"
+
+[tool.poetry.group.docs]
+optional = true
+
+[tool.poetry.group.docs.dependencies]
+sphinx = "^9.0"
+sphinx-rtd-theme = ">=3.0,<4.0"
+sphinx-autodoc-typehints = "^3.0"
+
+[tool.poetry.group.sast]
+optional = true
+
+[tool.poetry.group.sast.dependencies]
+bandit = "^1.9"
+
+[tool.poetry.group.sbom]
+optional = true
+
+[tool.poetry.group.sbom.dependencies]
+cyclonedx-bom = "^7.0"
+
+[tool.poetry.group.sbom-audit]
+optional = true
+
+[tool.poetry.group.sbom-audit.dependencies]
+pip-audit = "^2.10"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+filterwarnings = [
+    # Python 3.14: importlib.metadata.version() uses [] on its own Message object
+    # internally, which triggers its own DeprecationWarning (CPython issue).
+    "ignore::DeprecationWarning:importlib.metadata",
+]
+
+[tool.mypy]
+mypy_path = "src"
+python_version = "3.14"
+strict = true
+
+[tool.ruff]
+target-version = "py314"
+line-length = 88
+src = ["src"]
+
+[tool.ruff.lint]
+# D203 (one-blank-line-before-class) conflicts with D211 (no-blank-line-before-class)
+# D213 (multi-line-summary-second-line) conflicts with D212 (multi-line-summary-first-line)
+ignore = ["D203", "D213"]
+

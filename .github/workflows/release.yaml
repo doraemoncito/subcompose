@@ -1,0 +1,65 @@
+name: Build and publish to PyPI
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version (e.g. 1.0.0)
+        required: true
+
+jobs:
+  publish:
+    name: Build and publish to PyPI
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/project/subcompose/
+    permissions:
+      id-token: write
+      contents: write
+      actions: write
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.14'
+      - name: Build distributions
+        uses: ./.github/actions/build
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+      - name: Tag release
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag "v${{ inputs.version }}"
+          git push origin "v${{ inputs.version }}"
+      - name: Call docs workflow
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.actions.createWorkflowDispatch({
+              owner: 'doraemoncito',
+              repo: 'subcompose',
+              workflow_id: 'docs.yaml',
+              ref: process.env.GITHUB_REF_NAME || 'main'
+            })
+    # If GITHUB_TOKEN cannot trigger workflow_dispatch, use a PAT with repo and workflow permissions
+    # Add the PAT as a secret (e.g., GH_PAT) and use it in github-script step:
+    #
+    # - name: Call docs workflow
+    #   uses: actions/github-script@v7
+    #   with:
+    #     github-token: ${{ secrets.GH_PAT }}
+    #     script: |
+    #       github.rest.actions.createWorkflowDispatch({
+    #         owner: 'doraemoncito',
+    #         repo: 'subcompose',
+    #         workflow_id: 'docs.yaml',
+    #         ref: 'main'
+    #       })

@@ -1,0 +1,36 @@
+name: Build and publish to TestPyPI
+
+on:
+  workflow_dispatch:
+
+jobs:
+  publish_test:
+    name: Build and publish to TestPyPI
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+
+    # Ensure your repository is registered as a trusted publisher in TestPyPI
+    # https://test.pypi.org/manage/account/publishing/
+    # The environment name below must match the trusted publisher configuration
+    environment:
+      name: testpypi  # Must match TestPyPI trusted publisher config
+      url: https://test.pypi.org/project/subcompose/
+
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+
+      - name: Build distributions
+        uses: ./.github/actions/build
+
+      - name: List build output
+        run: ls -l dist
+
+      - name: Publish to TestPyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/subcompose/
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
