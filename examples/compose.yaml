@@ -1,0 +1,82 @@
+# You can override the location of the Docker container register by defining the environment variable REGISTRY_URL.
+version: '3.8'
+
+x-subcompose-groups:
+  core:
+    id: &core "core"
+    name: "Core Services"
+    description: "Core services required for the application to operate."
+  elk:
+    id: &elk "elk"
+    name: "ELK Stack"
+    description: "Services that make up the ELK (Elasticsearch, Logstash, Kibana) stack."
+  minimal:
+    id: &minimal "minimal"
+    name: "Minimal Services"
+    description: "Minimal set of services for basic operation."
+  standalone:
+    id: &standalone "standalone"
+    name: "Standalone Services"
+    description: "Services required for standalone operation."
+
+services:
+  admin:
+    x-subcompose-groups: core,minimal,standalone
+    image: busybox
+    command: ["sh", "-c", "echo 'admin service started' && sleep infinity"]
+  postgresql:
+    x-subcompose-groups: core,minimal,standalone
+    image: busybox
+    command: ["sh", "-c", "echo 'postgresql service started' && sleep infinity"]
+  neo4j:
+    x-subcompose-groups: core
+    image: busybox
+    command: ["sh", "-c", "echo 'neo4j service started' && sleep infinity"]
+  backend:
+    x-subcompose-groups: core,standalone
+    image: busybox
+    command: ["sh", "-c", "echo 'backend service started' && sleep infinity"]
+  webserver:
+    x-subcompose-groups: core,standalone
+    image: busybox
+    command: ["sh", "-c", "echo 'webserver service started' && sleep infinity"]
+  aws-simple-storage-service:
+    x-subcompose-groups: core
+    image: busybox
+    command: ["sh", "-c", "echo 'aws-simple-storage-service service started' && sleep infinity"]
+  frontend:
+    x-subcompose-groups: core,standalone
+    image: busybox
+    command: ["sh", "-c", "echo 'frontend service started' && sleep infinity"]
+  gateway:
+    x-subcompose-groups: core,standalone
+    image: busybox
+    command: ["sh", "-c", "echo 'gateway service started' && sleep infinity"]
+  elasticsearch:
+    x-subcompose-groups: elk
+    image: busybox
+    command: ["sh", "-c", "echo 'elasticsearch service started' && sleep infinity"]
+  kibana:
+    x-subcompose-groups: elk
+    image: busybox
+    command: ["sh", "-c", "echo 'kibana service started' && sleep infinity"]
+  logstash-logs:
+    x-subcompose-groups: elk
+    image: busybox
+    command: ["sh", "-c", "echo 'logstash-logs service started' && sleep infinity"]
+  filebeat-backend:
+    x-subcompose-groups: elk
+    image: busybox
+    command: ["sh", "-c", "echo 'filebeat-backend service started' && sleep infinity"]
+  filebeat-frontend:
+    x-subcompose-groups: elk
+    image: busybox
+    command: ["sh", "-c", "echo 'filebeat-frontend service started' && sleep infinity"]
+  filebeat-admin:
+    x-subcompose-groups: elk
+    image: busybox
+    command: ["sh", "-c", "echo 'filebeat-admin service started' && sleep infinity"]
+  filebeat-gateway:
+    x-subcompose-groups: elk
+    image: busybox
+    command: ["sh", "-c", "echo 'filebeat-gateway service started' && sleep infinity"]

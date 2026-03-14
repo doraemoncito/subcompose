@@ -1,0 +1,15 @@
+# Documentation build requirements.
+# Used by Read the Docs (pip fallback) and for local development without Poetry:
+#   pip install -r docs/requirements.txt
+#
+# For a full Poetry-managed install use:
+#   poetry install --with docs
+
+sphinx>=9.0,<10.0
+sphinx-rtd-theme>=3.0,<4.0
+sphinx-autodoc-typehints>=3.0,<4.0
+
+# Runtime dependencies needed by autodoc to import the package
+docopt-ng>=0.9.0,<1.0.0
+PyYAML>=6.0.3,<7.0
+

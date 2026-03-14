@@ -1,0 +1,23 @@
+name: Build distributions
+description: Install dependencies, generate the OpenAPI client, and build wheel + sdist
+
+runs:
+  using: composite
+  steps:
+    - name: Install poetry
+      run: pipx install poetry
+      shell: bash
+
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.14"
+        cache: "poetry"
+
+    - name: Install dependencies
+      run: poetry install --no-interaction
+      shell: bash
+
+    - name: Build package
+      run: make package
+      shell: bash
