@@ -1,5 +1,6 @@
 import subcompose
 
+
 def test_remove_subcompose_keys_removes_keys():
     data = {
         "x-subcompose-foo": "bar",
@@ -14,4 +15,3 @@ def test_remove_subcompose_keys_removes_keys():
     assert "keep" in cleaned["nested"]
     assert "x-subcompose-baz" not in cleaned["list"][0]
     assert "keep" in cleaned["list"][0]
-

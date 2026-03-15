@@ -4,6 +4,7 @@
 import subcompose
 from unittest.mock import patch
 
+
 def get_default_args():
     return {
         "--list": False,
@@ -31,6 +32,7 @@ def get_default_args():
         "--unmanaged": False,
     }
 
+
 @patch("subcompose.cli.docopt")
 @patch("pathlib.Path.read_text")
 @patch("sys.argv", ["subcompose.py", "--list"])
@@ -50,6 +52,7 @@ services:
     assert "[group1]" in captured.out
     assert "service1" in captured.out
     assert "service2" in captured.out
+
 
 @patch("subcompose.cli.docopt")
 @patch("pathlib.Path.read_text")
@@ -72,6 +75,7 @@ services:
     assert "docker compose" in args[0]
     assert "up -d" in args[0]
     assert "service1" in kwargs["input"]
+
 
 @patch("subcompose.cli.docopt")
 @patch("pathlib.Path.read_text")
@@ -96,6 +100,7 @@ services:
     assert "docker compose" in args[0]
     assert "stop" in args[0]
 
+
 @patch("subcompose.cli.docopt")
 @patch("pathlib.Path.read_text")
 @patch("subprocess.run")
@@ -118,6 +123,7 @@ services:
     args, kwargs = mock_run.call_args
     assert "docker compose" in args[0]
     assert "rm --force --stop" in args[0]
+
 
 @patch("subcompose.cli.docopt")
 @patch("pathlib.Path.read_text")
@@ -144,6 +150,7 @@ services:
     assert "docker rmi" in args2[0]
     assert "img1" in args2[0]
 
+
 @patch("subcompose.cli.docopt")
 @patch("pathlib.Path.read_text")
 @patch("sys.argv", ["subcompose.py", "preview", "--group=group1"])
@@ -162,6 +169,7 @@ services:
     captured = capsys.readouterr()
     assert "service1" in captured.out
     assert "img1" in captured.out
+
 
 @patch("subcompose.cli.docopt")
 @patch("pathlib.Path.read_text")
@@ -184,4 +192,3 @@ services:
         subcompose.main()
         mock_val_groups.assert_called_once()
         mock_val_volumes.assert_called_once()
-

@@ -1,72 +1,89 @@
-.PHONY: all dist clean compile run docs format lint package sast sbom sbom-audit test typecheck help
+# Suppress output unless running in debug mode
+ifeq ($(findstring d,$(MAKEFLAGS)),d)
+QUIET =
+else
+QUIET => /dev/null 2>&1
+endif
+
+.PHONY: all dist distclean clean compile run docs format lint package sast sbom sbom-audit test typecheck help ensure-poetry-install
 
 .DEFAULT_GOAL := help
 
 ARGS ?= --help
 
-all: lint typecheck compile test docs sast sbom-audit package ## 🟢 run all checks and build
-	@echo "🟢 All checks passed!"
+ensure-poetry-install:
+	@if [ ! -d .venv ] || ! poetry run ruff --version >/dev/null 2>&1; then \
+		echo "🔄  Setting up Poetry environment..."; \
+		poetry install --with dev,docs,sast,sbom,sbom-audit --no-interaction $(QUIET); \
+	fi
 
-compile: ## 🐍 compile the example application to check for syntax errors
-	@echo "🐍 Compiling example application..."
-	@PYTHONPATH=src poetry run python -m py_compile src/subcompose/__main__.py
+all: ensure-poetry-install lint typecheck compile test docs sast sbom-audit package ## 🟢 run all checks and build
+	@echo "🟢  All checks passed!"
+
+compile: ensure-poetry-install ## 🐍 compile the example application to check for syntax errors
+	@echo "🐍  Compiling example application..."
+	@PYTHONPATH=src poetry run python -m py_compile src/subcompose/__main__.py $(QUIET)
 
 clean: ## 🧹 remove all generated build artefacts
-	@echo "🧹 Cleaning generated files..."
-	@rm -rf build dist .mypy_cache .pytest_cache __pycache__
-	@find . -type d -name __pycache__ -exec rm -rf {} +
+	@echo "🧹  Cleaning generated files..."
+	@rm -rf build dist .mypy_cache .pytest_cache __pycache__ $(QUIET)
+	@find . -type d -name __pycache__ -exec rm -rf {} + $(QUIET)
+
+distclean: clean ## 🧹 remove all build artefacts and Python environment
+	@echo "🧹  Deactivating Python virtual environment (if active)..."
+	@if [ "$VIRTUAL_ENV" != "" ]; then \
+		@deactivate $(QUIET) || true; \
+	fi
+	@echo "🧹  Removing .venv directory..."
+	@rm -rf .venv $(QUIET)
 
 dist: lint typecheck compile test docs package ## 📦 build the distributable package after running all checks
-	@echo "📦 Distribution build complete!"
+	@echo "📦  Distribution build complete!"
 
-docs: ## 📚 build the Sphinx documentation
-	@echo "📚 Building documentation..."
-	@poetry install --with docs --no-interaction
-	@poetry run sphinx-build -W --keep-going -b html docs build/docs/html
+docs: ensure-poetry-install ## 📚 build the Sphinx documentation
+	@echo "📚  Building documentation..."
+	@poetry run sphinx-build -W --keep-going -b html docs build/docs/html $(QUIET)
 
 show-docs: ## 🌐 open the built documentation in your web browser
-	@echo "🌐 Opening documentation in your web browser..."
-	@open build/docs/html/index.html
+	@echo "🌐  Opening documentation in your web browser..."
+	@open build/docs/html/index.html $(QUIET)
 
-format: ## 🎨 format code with ruff
-	@echo "🎨 Formatting code with ruff..."
-	@poetry run ruff format .
+format: ensure-poetry-install ## 🎨 format code with ruff
+	@echo "🎨  Formatting code with ruff..."
+	@poetry run ruff format . $(QUIET)
 
-lint: ## 🔍 check code with ruff
-	@echo "🔍 Linting code with ruff..."
-	@poetry run ruff check --fix .
+lint: ensure-poetry-install ## 🔍 check code with ruff
+	@echo "🔍  Linting code with ruff..."
+	@poetry run ruff check --fix . $(QUIET)
 
-package: ## 🏗️ build the distributable wheel and sdist with Poetry
-	@echo "🏗️ Building distributable package..."
-	@poetry build
+package: ensure-poetry-install ## 🏗️ build the distributable wheel and sdist with Poetry
+	@echo "🏗️  Building distributable package..."
+	@poetry build $(QUIET)
 
-run: ## ▶️ run example application to demonstrate usage of the client library
-	@echo "▶️ Running example application..."
-	@PYTHONPATH=src poetry run python src/subcompose/__main__.py $(ARGS)
+run: ensure-poetry-install ## ▶️ run example application to demonstrate usage of the client library
+	@echo "▶️  Running example application..."
+	@PYTHONPATH=src poetry run python src/subcompose/__main__.py $(ARGS) $(QUIET)
 
-sast: ## 🔒 scan for security issues with bandit
-	@echo "🔒 Scanning for security issues..."
-	@poetry install --with sast --no-interaction
-	@poetry run bandit --ini .bandit.ini --exit-zero src/subcompose
+sast: ensure-poetry-install ## 🔒 scan for security issues with bandit
+	@echo "🔒  Scanning for security issues..."
+	@poetry run bandit --ini .bandit.ini --exit-zero src/subcompose $(QUIET)
 
-sbom: ## 🧾 generate CycloneDX SBOM (JSON)
-	@echo "📦 Generating SBOM..."
-	@poetry install --with sbom --no-interaction
-	@mkdir -p build
-	@poetry run cyclonedx-py environment --pyproject pyproject.toml --mc-type library --of JSON -o build/subcompose.cdx.json
+sbom: ensure-poetry-install ## 🧾 generate CycloneDX SBOM (JSON)
+	@echo "📦  Generating SBOM..."
+	@mkdir -p build $(QUIET)
+	@poetry run cyclonedx-py environment --pyproject pyproject.toml --mc-type library --of JSON -o build/subcompose.cdx.json $(QUIET)
 
-sbom-audit: sbom ## 🔬 audit SBOM for known vulnerabilities (CVEs)
-	@echo "🔬 Auditing SBOM for vulnerabilities..."
-	@poetry install --with sbom-audit --no-interaction
-	@poetry run pip-audit --local --skip-editable -s osv -f columns --progress-spinner off
+sbom-audit: ensure-poetry-install sbom ## 🔬 audit SBOM for known vulnerabilities (CVEs)
+	@echo "🔬  Auditing SBOM for vulnerabilities..."
+	@poetry run pip-audit --local --skip-editable -s osv -f columns --progress-spinner off $(QUIET)
 
-test: ## 🧪 run tests with pytest
-	@echo "🧪 Running tests with pytest..."
-	@poetry run pytest .
+test: ensure-poetry-install ## 🧪 run tests with pytest
+	@echo "🧪  Running tests with pytest..."
+	@poetry run pytest . $(QUIET)
 
-typecheck: ## 🔎 check types with mypy
-	@echo "🔎 Checking types with mypy..."
-	@poetry run mypy --no-incremental src/subcompose
+typecheck: ensure-poetry-install ## 🔎 check types with mypy
+	@echo "🔎  Checking types with mypy..."
+	@poetry run mypy --no-incremental src/subcompose $(QUIET)
 
 help: ## 💡 show this help message
 	@echo "\033[1msubcompose\033[0m — manage subsets of services in Docker compose.yaml files"
@@ -78,3 +95,5 @@ help: ## 💡 show this help message
 	@echo "\033[1mTargets:\033[0m"
 	@echo ""
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | grep -v '^#' | awk 'BEGIN {FS = ":.*?## "}; {split($$2, a, " "); icon=a[1]; sub(a[1] " ", "", $$2); printf "  %s  \033[1m%-20s\033[0m %s\n", icon, $$1, $$2}'
+	@echo ""
+	@echo "\033[1mNote:\033[0m Use the -d flag (make -d <target>) to run in debug mode. Output suppression is disabled in debug mode, so all command output will be shown."

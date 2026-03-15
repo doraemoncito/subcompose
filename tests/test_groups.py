@@ -3,6 +3,7 @@
 
 import subcompose
 
+
 def test_get_groups_from_data_extracts_groups_correctly():
     data = {
         "services": {
@@ -20,9 +21,11 @@ def test_get_groups_from_data_extracts_groups_correctly():
     assert "service2" in groups["group2"]
     assert "service3" in groups["all"]
 
+
 def test_get_groups_from_data_handles_empty_data():
     groups = subcompose.get_groups_from_data({})
     assert groups == {}
+
 
 def test_get_groups_from_data_handles_none():
     groups = subcompose.get_groups_from_data(None)

@@ -12,7 +12,6 @@ dependencies = [
     "PyYAML>=6.0.3,<7.0"
 ]
 
-
 [project.scripts]
 subcompose = "subcompose.cli:main"
 
@@ -84,4 +83,3 @@ src = ["src"]
 # D203 (one-blank-line-before-class) conflicts with D211 (no-blank-line-before-class)
 # D213 (multi-line-summary-second-line) conflicts with D212 (multi-line-summary-first-line)
 ignore = ["D203", "D213"]
-

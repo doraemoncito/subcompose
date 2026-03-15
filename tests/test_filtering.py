@@ -4,6 +4,7 @@
 import subcompose
 from unittest.mock import patch, MagicMock
 
+
 def test_filter_by_image_tag_filters_containers():
     parent = {
         "services": {

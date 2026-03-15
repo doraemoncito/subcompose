@@ -107,12 +107,13 @@ from subcompose.substitution import (
 from subcompose.utils import remove_subcompose_keys, represent_none
 from subcompose.validation import validate_groups, validate_volumes
 
-BOLD = '\033[1m'
-RESET = '\033[0m'
+BOLD = "\033[1m"
+RESET = "\033[0m"
+
 
 # Function to bold 'subcompose' in any string
 def bold_subcompose(text: str) -> str:
-    return re.sub(r'(subcompose)', f'{BOLD}\1{RESET}', text, flags=re.IGNORECASE)
+    return re.sub(r"(subcompose)", f"{BOLD}\1{RESET}", text, flags=re.IGNORECASE)
 
 
 def main() -> None:
@@ -366,7 +367,9 @@ def main() -> None:
                 return
 
         if arguments["run"]:
-            logging.debug(bold_subcompose("\nRunning 'docker compose up' using generated YAML..."))
+            logging.debug(
+                bold_subcompose("\nRunning 'docker compose up' using generated YAML...")
+            )
             cmd_str = f"{COMPOSE_COMMAND} --project-name {project_name} -f - up -d"
             subprocess.run(
                 cmd_str,
@@ -378,7 +381,11 @@ def main() -> None:
             return
 
         if arguments["stop"]:
-            logging.debug(bold_subcompose("\nRunning 'docker compose stop' using generated YAML..."))
+            logging.debug(
+                bold_subcompose(
+                    "\nRunning 'docker compose stop' using generated YAML..."
+                )
+            )
             cmd_str = f"{COMPOSE_COMMAND} --project-name {project_name} -f - stop"
             subprocess.run(
                 cmd_str,
@@ -391,14 +398,18 @@ def main() -> None:
 
         if arguments["delete-containers"] or arguments["delete-images"]:
             if arguments["delete-containers"] and arguments["--all"]:
-                logging.debug(bold_subcompose("\nDeleting ALL containers on the system..."))
+                logging.debug(
+                    bold_subcompose("\nDeleting ALL containers on the system...")
+                )
                 cmd_str = (
                     "docker stop $(docker ps -a -q) && docker rm -f $(docker ps -a -q)"
                 )
                 subprocess.run(cmd_str, shell=True, check=False)
                 return
 
-            logging.debug(bold_subcompose("\nRunning 'docker compose rm' using generated YAML..."))
+            logging.debug(
+                bold_subcompose("\nRunning 'docker compose rm' using generated YAML...")
+            )
             cmd_str = f"{COMPOSE_COMMAND} --project-name {project_name} -f - rm --force --stop"
             subprocess.run(
                 cmd_str,
@@ -409,7 +420,11 @@ def main() -> None:
             )
 
             if arguments["delete-images"]:
-                logging.debug(bold_subcompose("\nRunning 'docker rmi' against Docker images in generated YAML..."))
+                logging.debug(
+                    bold_subcompose(
+                        "\nRunning 'docker rmi' against Docker images in generated YAML..."
+                    )
+                )
                 tagged_images = [
                     params["image"]
                     for service, params in substituted_data["services"].items()
