@@ -1,10 +1,10 @@
 # 🐳 subcompose
 
-[![Python Version](https://img.shields.io/badge/python-3.14%2B-blue)](https://www.python.org/downloads/release/python-314/) 
-[![PyPI Version](https://img.shields.io/pypi/v/subcompose.svg)](https://pypi.org/project/subcompose/) 
-[![License: GPL v3](https://img.shields.io/badge/license-GPLv3-blue)](https://github.com/doraemoncito/subcompose/blob/main/LICENSE) 
-[![Documentation](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://doraemoncito.github.io/subcompose/) 
-[![GitHub](https://img.shields.io/badge/source-GitHub-black)](https://github.com/doraemoncito/subcompose) 
+[![Python Version](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/downloads/release/python-310/)
+[![PyPI Version](https://img.shields.io/pypi/v/subcompose.svg)](https://pypi.org/project/subcompose/)
+[![License: GPL v3](https://img.shields.io/badge/license-GPLv3-blue)](https://github.com/doraemoncito/subcompose/blob/main/LICENSE)
+[![Documentation](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://doraemoncito.github.io/subcompose/)
+[![GitHub](https://img.shields.io/badge/source-GitHub-black)](https://github.com/doraemoncito/subcompose)
 
 A command line utility to manage subsets of services in `compose.yaml` files.
 

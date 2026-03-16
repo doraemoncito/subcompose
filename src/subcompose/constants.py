@@ -28,6 +28,8 @@ ARG_COMPOSE_FILE = "--compose-file"
 ARG_UNMANAGED = "--unmanaged"
 
 COMPOSE_COMMAND = "docker compose"
-MAX_LEVELNAME_LEN = max(
-    (len(str(name)) for name in logging.getLevelNamesMapping().keys()), default=0
-)
+if hasattr(logging, "getLevelNamesMapping"):
+    _level_names = logging.getLevelNamesMapping()
+else:
+    _level_names = logging._nameToLevel
+MAX_LEVELNAME_LEN = max((len(str(name)) for name in _level_names.keys()), default=0)

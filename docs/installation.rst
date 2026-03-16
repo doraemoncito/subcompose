@@ -4,7 +4,7 @@ Installation
 Requirements
 ------------
 
-* Python 3.14 or later
+* Python 3.10 or later
 * Docker with Compose V2 (``docker compose``)
 * Poetry (for development)
 
