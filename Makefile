@@ -1,8 +1,11 @@
-# Suppress output unless running in debug mode
-ifeq ($(findstring d,$(MAKEFLAGS)),d)
-QUIET =
-else
+# Make will automatically set the `MAKEFLAGS` variable when you run it with certain flags. The 's' flag is used for
+# silent mode, which suppresses command output. We can check for this flag in our Makefile to conditionally set a
+# QUIET variable that we can use to suppress output in our commands.  --silent and --quiet are synonyms for the 's'
+# flag, so this will work regardless of which one is used.
+ifeq ($(findstring s,$(MAKEFLAGS)),s)
 QUIET => /dev/null 2>&1
+else
+QUIET =
 endif
 
 .PHONY: all dist distclean clean compile run docs format lint package sast sbom sbom-audit test typecheck help ensure-poetry-install
@@ -88,12 +91,11 @@ typecheck: ensure-poetry-install ## 🔎 check types with mypy
 help: ## 💡 show this help message
 	@echo "\033[1msubcompose\033[0m — manage subsets of services in Docker compose.yaml files"
 	@echo ""
-	@echo "\033[1mUsage:\033[0m make [target] [target ...] [ARGS=\"...\"]"
+	@echo "\033[1mUsage:\033[0m make [--quiet|--silent] [target] [target ...] [ARGS=\"...\"]"
 	@echo ""
+	@echo "  Use --quiet or --silent (e.g. make --quiet docs) to suppress command output."
 	@echo "  To pass application parameters to \033[1m\"make run\"\033[0m, use ARGS (e.g. make run ARGS=\"--help\")."
 	@echo ""
 	@echo "\033[1mTargets:\033[0m"
 	@echo ""
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | grep -v '^#' | awk 'BEGIN {FS = ":.*?## "}; {split($$2, a, " "); icon=a[1]; sub(a[1] " ", "", $$2); printf "  %s  \033[1m%-20s\033[0m %s\n", icon, $$1, $$2}'
-	@echo ""
-	@echo "\033[1mNote:\033[0m Use the -d flag (make -d <target>) to run in debug mode. Output suppression is disabled in debug mode, so all command output will be shown."

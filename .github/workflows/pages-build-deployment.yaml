@@ -51,7 +51,7 @@ jobs:
           python-version: "3.14"
           cache: "poetry"
       - name: Install dependencies
-        run: poetry install --no-interaction
+        run: poetry install --with docs --no-interaction
       - name: Build docs
         run: make docs -d
       - name: Upload built documentation
