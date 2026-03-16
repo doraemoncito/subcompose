@@ -15,7 +15,11 @@ endif
 ARGS ?= --help
 
 ensure-poetry-install:
-	@if [ ! -d .venv ] || ! poetry run ruff --version >/dev/null 2>&1; then \
+	@if ! command -v poetry $(QUIET) && [ ! -x $(HOME)/.local/bin/poetry ]; then \
+		echo "🛠️  Poetry not found. Installing..."; \
+		curl -sSL https://install.python-poetry.org | python3 - $(QUIET); \
+	fi
+	@if [ ! -d .venv ] || ! poetry run ruff --version $(QUIET); then \
 		echo "🔄  Setting up Poetry environment..."; \
 		poetry install --with dev,docs,sast,sbom,sbom-audit --no-interaction $(QUIET); \
 	fi
@@ -35,13 +39,15 @@ clean: ## 🧹 remove all generated build artefacts
 distclean: clean ## 🧹 remove all build artefacts and Python environment
 	@echo "🧹  Deactivating Python virtual environment (if active)..."
 	@if [ "$VIRTUAL_ENV" != "" ]; then \
-		@deactivate $(QUIET) || true; \
+		deactivate $(QUIET) || true; \
 	fi
 	@echo "🧹  Removing .venv directory..."
 	@rm -rf .venv $(QUIET)
 
-dist: lint typecheck compile test docs package ## 📦 build the distributable package after running all checks
+dist: all dist-post ## 📦 run all checks, security scan, SBOM audit, and build the distributable package
 	@echo "📦  Distribution build complete!"
+
+dist-post: sast sbom sbom-audit package
 
 docs: ensure-poetry-install ## 📚 build the Sphinx documentation
 	@echo "📚  Building documentation..."
@@ -95,6 +101,7 @@ help: ## 💡 show this help message
 	@echo ""
 	@echo "  Use --quiet or --silent (e.g. make --quiet docs) to suppress command output."
 	@echo "  To pass application parameters to \033[1m\"make run\"\033[0m, use ARGS (e.g. make run ARGS=\"--help\")."
+	@echo "  \033[1mTip:\033[0m For faster builds, use 'make dist -j N' (N = CPU cores)"
 	@echo ""
 	@echo "\033[1mTargets:\033[0m"
 	@echo ""
