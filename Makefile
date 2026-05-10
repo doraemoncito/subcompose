@@ -69,6 +69,10 @@ package: ensure-poetry-install ## 🏗️ build the distributable wheel and sdis
 	@echo "🏗️  Building distributable package..."
 	@poetry build $(QUIET)
 
+release: ensure-poetry-install ## 🚀 build and publish a new release to PyPI
+	@echo "🚀  Building package and publishing to PyPI..."
+	@poetry publish --build $(QUIET)
+
 run: ensure-poetry-install ## ▶️ run example application to demonstrate usage of the client library
 	@echo "▶️  Running example application..."
 	@PYTHONPATH=src poetry run python src/subcompose/__main__.py $(ARGS) $(QUIET)

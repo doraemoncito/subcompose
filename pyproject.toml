@@ -25,7 +25,7 @@ build-backend = "poetry.core.masonry.api"
 # reads [tool.poetry] even when --pyproject points to a PEP 621 file.
 # Poetry itself ignores these values and uses [project] instead.
 name = "subcompose"
-version = "1.0.0.dev0"
+version = "1.0.0"
 packages = [{include = "subcompose", from = "src"}]
 
 [tool.poetry.group.dev.dependencies]
@@ -34,6 +34,7 @@ pygments = "^2.20.0"
 types-pyyaml = "^6.0.12.20250915"
 mypy = "^1.19.1"
 ruff = "^0.14.10"
+pip = "^26.1"
 pytest-cov = "^7.0.0"
 
 [tool.poetry.group.docs]
