@@ -6,7 +6,7 @@ Requirements
 
 * Python 3.10 or later
 * Docker with Compose V2 (``docker compose``)
-* Poetry (for development)
+* uv (for development)
 
 Install from PyPI
 -----------------
@@ -18,24 +18,23 @@ Install from PyPI
 Install from source
 -------------------
 
-Clone the repository and install the package with Poetry:
+Clone the repository and install the package with `uv <https://docs.astral.sh/uv/>`__:
 
 .. code-block:: console
 
    $ git clone https://github.com/doraemoncito/subcompose.git
    $ cd subcompose
-   $ poetry install
+   $ uv sync
 
-This installs the ``subcompose`` command into the Poetry-managed virtual
-environment.  Activate it with:
-
-.. code-block:: console
-
-   $ poetry shell
-
-Or prefix every invocation with ``poetry run``:
+This installs the ``subcompose`` command into the ``.venv`` virtual
+environment in the project root.  Activate it with:
 
 .. code-block:: console
 
-   $ poetry run subcompose --help
+   $ source .venv/bin/activate
 
+Or prefix every invocation with ``uv run``:
+
+.. code-block:: console
+
+   $ uv run subcompose --help

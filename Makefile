@@ -1,3 +1,4 @@
+
 # Make will automatically set the `MAKEFLAGS` variable when you run it with certain flags. The 's' flag is used for
 # silent mode, which suppresses command output. We can check for this flag in our Makefile to conditionally set a
 # QUIET variable that we can use to suppress output in our commands.  --silent and --quiet are synonyms for the 's'
@@ -8,28 +9,28 @@ else
 QUIET =
 endif
 
-.PHONY: all dist distclean clean compile run docs format lint package sast sbom sbom-audit test typecheck help ensure-poetry-install
+.PHONY: all dist distclean clean compile run docs format lint package sast sbom sbom-audit test typecheck help ensure-uv-install
 
 .DEFAULT_GOAL := help
 
 ARGS ?= --help
 
-ensure-poetry-install:
-	@if ! command -v poetry $(QUIET) && [ ! -x $(HOME)/.local/bin/poetry ]; then \
-		echo "🛠️  Poetry not found. Installing..."; \
-		curl -sSL https://install.python-poetry.org | python3 - $(QUIET); \
+ensure-uv-install:
+	@if ! command -v uv $(QUIET) && [ ! -x $(HOME)/.local/bin/uv ]; then \
+		echo "🛠️  uv not found. Installing..."; \
+		curl -LsSf https://astral.sh/uv/install.sh | sh $(QUIET); \
 	fi
-	@if [ ! -d .venv ] || ! poetry run ruff --version $(QUIET); then \
-		echo "🔄  Setting up Poetry environment..."; \
-		poetry install --with dev,docs,sast,sbom,sbom-audit --no-interaction $(QUIET); \
+	@if [ ! -d .venv ] || ! uv run ruff --version $(QUIET); then \
+		echo "🔄  Setting up uv environment..."; \
+		uv sync --all-groups --frozen $(QUIET); \
 	fi
 
-all: ensure-poetry-install lint typecheck compile test docs sast sbom-audit package ## 🟢 run all checks and build
+all: ensure-uv-install lint typecheck compile test docs sast sbom-audit package ## 🟢 run all checks and build
 	@echo "🟢  All checks passed!"
 
-compile: ensure-poetry-install ## 🐍 compile the example application to check for syntax errors
+compile: ensure-uv-install ## 🐍 compile the example application to check for syntax errors
 	@echo "🐍  Compiling example application..."
-	@PYTHONPATH=src poetry run python -m py_compile src/subcompose/__main__.py $(QUIET)
+	@PYTHONPATH=src uv run python -m py_compile src/subcompose/__main__.py $(QUIET)
 
 clean: ## 🧹 remove all generated build artefacts
 	@echo "🧹  Cleaning generated files..."
@@ -49,54 +50,55 @@ dist: all dist-post ## 📦 run all checks, security scan, SBOM audit, and build
 
 dist-post: sast sbom sbom-audit package
 
-docs: ensure-poetry-install ## 📚 build the Sphinx documentation
+docs: ensure-uv-install ## 📚 build the Sphinx documentation
 	@echo "📚  Building documentation..."
-	@poetry run sphinx-build -W --keep-going -b html docs build/docs/html $(QUIET)
+	@uv run sphinx-build -W --keep-going -b html docs build/docs/html $(QUIET)
 
 show-docs: ## 🌐 open the built documentation in your web browser
 	@echo "🌐  Opening documentation in your web browser..."
 	@open build/docs/html/index.html $(QUIET)
 
-format: ensure-poetry-install ## 🎨 format code with ruff
+format: ensure-uv-install ## 🎨 format code with ruff
 	@echo "🎨  Formatting code with ruff..."
-	@poetry run ruff format . $(QUIET)
+	@uv run ruff format . $(QUIET)
 
-lint: ensure-poetry-install ## 🔍 check code with ruff
+lint: ensure-uv-install ## 🔍 check code with ruff
 	@echo "🔍  Linting code with ruff..."
-	@poetry run ruff check --fix . $(QUIET)
+	@uv run ruff check --fix . $(QUIET)
 
-package: ensure-poetry-install ## 🏗️ build the distributable wheel and sdist with Poetry
+package: ensure-uv-install ## 🏗️ build the distributable wheel and sdist with uv
 	@echo "🏗️  Building distributable package..."
-	@poetry build $(QUIET)
+	@uv build $(QUIET)
 
-release: ensure-poetry-install ## 🚀 build and publish a new release to PyPI
+release: ensure-uv-install ## 🚀 build and publish a new release to PyPI
 	@echo "🚀  Building package and publishing to PyPI..."
-	@poetry publish --build $(QUIET)
+	@uv build $(QUIET)
+	@uv publish $(QUIET)
 
-run: ensure-poetry-install ## ▶️ run example application to demonstrate usage of the client library
+run: ensure-uv-install ## ▶️ run example application to demonstrate usage of the client library
 	@echo "▶️  Running example application..."
-	@PYTHONPATH=src poetry run python src/subcompose/__main__.py $(ARGS) $(QUIET)
+	@PYTHONPATH=src uv run python src/subcompose/__main__.py $(ARGS) $(QUIET)
 
-sast: ensure-poetry-install ## 🔒 scan for security issues with bandit
+sast: ensure-uv-install ## 🔒 scan for security issues with bandit
 	@echo "🔒  Scanning for security issues..."
-	@poetry run bandit --ini .bandit.ini --exit-zero src/subcompose $(QUIET)
+	@uv run bandit --ini .bandit.ini --exit-zero src/subcompose $(QUIET)
 
-sbom: ensure-poetry-install ## 🧾 generate CycloneDX SBOM (JSON)
+sbom: ensure-uv-install ## 🧾 generate CycloneDX SBOM (JSON)
 	@echo "📦  Generating SBOM..."
 	@mkdir -p build $(QUIET)
-	@poetry run cyclonedx-py environment --pyproject pyproject.toml --mc-type library --of JSON -o build/subcompose.cdx.json $(QUIET)
+	@uv run cyclonedx-py environment --pyproject pyproject.toml --mc-type library --of JSON -o build/subcompose.cdx.json $(QUIET)
 
-sbom-audit: ensure-poetry-install sbom ## 🔬 audit SBOM for known vulnerabilities (CVEs)
+sbom-audit: ensure-uv-install sbom ## 🔬 audit SBOM for known vulnerabilities (CVEs)
 	@echo "🔬  Auditing SBOM for vulnerabilities..."
-	@poetry run pip-audit --local --skip-editable -s osv -f columns --progress-spinner off $(QUIET)
+	@uv run pip-audit --local --skip-editable -s osv -f columns --progress-spinner off $(QUIET)
 
-test: ensure-poetry-install ## 🧪 run tests with pytest
+test: ensure-uv-install ## 🧪 run tests with pytest
 	@echo "🧪  Running tests with pytest..."
-	@poetry run pytest . $(QUIET)
+	@uv run pytest . $(QUIET)
 
-typecheck: ensure-poetry-install ## 🔎 check types with mypy
+typecheck: ensure-uv-install ## 🔎 check types with mypy
 	@echo "🔎  Checking types with mypy..."
-	@poetry run mypy --no-incremental src/subcompose $(QUIET)
+	@uv run mypy --no-incremental src/subcompose $(QUIET)
 
 help: ## 💡 show this help message
 	@echo "\033[1msubcompose\033[0m — manage subsets of services in Docker compose.yaml files"

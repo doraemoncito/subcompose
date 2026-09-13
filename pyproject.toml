@@ -7,6 +7,7 @@ authors = [
 ]
 readme = "README.md"
 requires-python = ">=3.10,<4.0"
+version = "1.0.0"
 dependencies = [
     "docopt-ng>=0.9.0,<1.0.0",
     "PyYAML>=6.0.3,<7.0"
@@ -16,56 +17,40 @@ dependencies = [
 subcompose = "subcompose.cli:main"
 
 [build-system]
-requires = ["poetry-core>=2.0.0,<3.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
-[tool.poetry]
-# name and version are duplicated here as a workaround for a cyclonedx-py bug:
-# https://github.com/CycloneDX/cyclonedx-python/issues — pyproject2component()
-# reads [tool.poetry] even when --pyproject points to a PEP 621 file.
-# Poetry itself ignores these values and uses [project] instead.
-name = "subcompose"
-version = "1.0.0"
-packages = [{include = "subcompose", from = "src"}]
+[tool.hatch.build.targets.wheel]
+packages = ["src/subcompose"]
 
-[tool.poetry.group.dev.dependencies]
-pytest = "^9.0.3"
-pygments = "^2.20.0"
-types-pyyaml = "^6.0.12.20250915"
-mypy = "^1.19.1"
-ruff = "^0.14.10"
-pip = "^26.1"
-pytest-cov = "^7.0.0"
-
-[tool.poetry.group.docs]
-optional = true
-
-[tool.poetry.group.docs.dependencies]
-sphinx = "^8.0"
-sphinx-rtd-theme = ">=3.0,<4.0"
-sphinx-autodoc-typehints = "^3.0"
-pygments = "^2.20.0"
-requests = "^2.33.1"
-
-[tool.poetry.group.sast]
-optional = true
-
-[tool.poetry.group.sast.dependencies]
-bandit = "^1.9"
-
-[tool.poetry.group.sbom]
-optional = true
-
-[tool.poetry.group.sbom.dependencies]
-cyclonedx-bom = "^7.3.0"
-lxml = "^6.1.0"
-
-[tool.poetry.group.sbom-audit]
-optional = true
-
-[tool.poetry.group.sbom-audit.dependencies]
-pip-audit = "^2.10"
-requests = "^2.33.1"
+[dependency-groups]
+dev = [
+    "pytest>=9.0.3,<10",
+    "pygments>=2.20.0,<3",
+    "types-pyyaml>=6.0.12.20250915,<7",
+    "mypy>=1.19.1,<2",
+    "ruff>=0.14.10,<0.15",
+    "pip>=26.1,<27",
+    "pytest-cov>=7.0.0,<8",
+]
+docs = [
+    "sphinx>=8.0,<9",
+    "sphinx-rtd-theme>=3.0,<4.0",
+    "sphinx-autodoc-typehints>=3.0,<4",
+    "pygments>=2.20.0,<3",
+    "requests>=2.33.1,<3",
+]
+sast = [
+    "bandit>=1.9,<2",
+]
+sbom = [
+    "cyclonedx-bom>=7.3.0,<8",
+    "lxml>=6.1.0,<7",
+]
+sbom-audit = [
+    "pip-audit>=2.10,<3",
+    "requests>=2.33.1,<3",
+]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

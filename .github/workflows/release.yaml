@@ -26,9 +26,10 @@ jobs:
       - name: Checkout sources
         uses: actions/checkout@v4
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.14'
+          cache: "uv"
       - name: Build distributions
         uses: ./.github/actions/build
       - name: Publish to PyPI

@@ -1,9 +1,9 @@
 # Documentation build requirements.
-# Used by Read the Docs (pip fallback) and for local development without Poetry:
+# Used by Read the Docs (pip fallback) and for local development without uv:
 #   pip install -r docs/requirements.txt
 #
-# For a full Poetry-managed install use:
-#   poetry install --with docs
+# For a full uv-managed install use:
+#   uv sync --group docs
 
 sphinx>=9.0,<10.0
 sphinx-rtd-theme>=3.0,<4.0

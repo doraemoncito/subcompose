@@ -21,11 +21,11 @@ A command line utility to manage subsets of services in `compose.yaml` files.
 
 SubCompose helps you orchestrate, validate, and manage complex Docker Compose setups by grouping services and providing advanced CLI operations.
 
-# Quick Installation
+## Quick Installation
 
 You can install SubCompose directly from the GitHub releases or from PyPI.
 
-## Install from GitHub releases
+### Install from GitHub releases
 
 ```bash
 pip install https://github.com/doraemoncito/subcompose/archive/refs/tags/vX.Y.Z.tar.gz
@@ -33,7 +33,7 @@ pip install https://github.com/doraemoncito/subcompose/archive/refs/tags/vX.Y.Z.
 
 Replace `vX.Y.Z` with the desired release version.
 
-## Install from PyPI
+### Install from PyPI
 
 ```bash
 pip install subcompose
@@ -52,12 +52,10 @@ subcompose --help
 
 ## Local Installation from Source
 
-1. Install poetry if you don't have it already. The officially recommended approach is via the installer script which uses Python itself and works on macOS, Linux, and Windows:
+1. Install [uv](https://docs.astral.sh/uv/) if you don't have it already. The officially recommended approach is via the installer script which works on macOS, Linux, and Windows:
 
     ```bash
-    python3 -m pip install --user pipx
-    python3 -m pipx ensurepath
-    pipx install poetry
+    curl -LsSf https://astral.sh/uv/install.sh | sh
     ```
 
     This method has several advantages:
@@ -69,14 +67,16 @@ subcompose --help
     Upgrade later with:
 
     ```bash
-    pipx upgrade poetry
+    uv self update
     ```
 
-2. Install subcompose using Poetry:
+2. Install subcompose using uv:
 
     ```bash
-    poetry install
+    uv sync
     ```
+
+    This creates a `.venv` virtual environment in the project root with all dependencies installed. Run the CLI with `uv run subcompose --help` (or activate the environment with `source .venv/bin/activate`).
 
 ## Usage
 
